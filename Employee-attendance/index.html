@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Attendance Portal</title>
+    <style>
+        /* Base styles */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #4361ee;
+            --secondary: #ff6b6b;
+            --present: #32CD32;
+            --halfday: #FFA500;
+            --white: #ffffff;
+            --light-bg: #f0f7ff;
+            --card-shadow: 0 8px 20px rgba(67, 97, 238, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: var(--light-bg);
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes underlineAnimation {
+            100% {
+                transform: scaleX(1);
+            }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Header Styles */
+        .header-banner {
+            background: linear-gradient(135deg, var(--primary), #5a7fff);
+            color: var(--white);
+            padding: 15px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1), transparent);
+            opacity: 0.3;
+        }
+
+        .header {
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .header h1 {
+            color: var(--white);
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            font-weight: 600;
+            letter-spacing: 1px;
+            animation: fadeInUp 1.5s ease-out;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1::after {
+            content: '';
+            display: block;
+            width: 50%;
+            height: 3px;
+            margin: 10px auto 0;
+            background: var(--white);
+            transform: scaleX(0);
+            animation: underlineAnimation 0.8s ease-out forwards;
+            opacity: 0.7;
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 25px;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(67, 97, 238, 0.15);
+        }
+
+        .card h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+        }
+
+        /* Form Styles */
+        .input-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            width: 100%;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e8ff;
+            border-radius: 15px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: #f8faff;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(67, 97, 238, 0.2);
+            transform: scale(1.02);
+        }
+
+        /* Button Styles */
+        .btn-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            min-width: 150px;
+            flex-grow: 1;
+            max-width: 200px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-in {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-out {
+            background: var(--secondary);
+            color: var(--white);
+        }
+
+        /* Success Popup */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: var(--present);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        .success-icon {
+            display: inline-block;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 15px;
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            min-width: 600px;
+        }
+
+        th {
+            color: var(--primary);
+            padding: 15px;
+            text-align: left;
+            background: rgba(67, 97, 238, 0.05);
+            position: sticky;
+            top: 0;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        td {
+            padding: 15px;
+            background: var(--white);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            font-size: 0.9rem;
+        }
+
+        tr {
+            animation: slideIn 0.5s ease-out forwards;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Status Styles */
+        .status-in { color: var(--primary); font-weight: bold; }
+        .status-out { color: var(--secondary); font-weight: bold; }
+        .status-absent { color: var(--secondary); font-weight: bold; }
+        .status-halfday { color: var(--halfday); font-weight: bold; }
+        .status-present { color: var(--present); font-weight: bold; }
+        
+        /* Responsive styles */
+        @media (min-width: 768px) {
+            .input-container {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+            
+            .btn-container {
+                justify-content: center;
+            }
+            
+            button {
+                flex-grow: 0;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .card {
+                padding: 20px 15px;
+            }
+            
+            input, button {
+                padding: 10px 15px;
+            }
+
+            .header h1 {
+                margin-bottom: 10px;
+            }
+            
+            .header h1::after {
+                margin-top: 5px;
+            }
+            
+            th, td {
+                padding: 10px;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --light-bg: #1a1a2e;
+                --white: #262645;
+                --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            }
+            
+            body {
+                color: #e1e1e1;
+            }
+            
+            input {
+                background: #262645;
+                border-color: #373762;
+                color: #e1e1e1;
+            }
+            
+            td, th {
+                color: #e1e1e1;
+                background: #262645;
+            }
+            
+            th {
+                background: rgba(67, 97, 238, 0.2);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header-banner">
+        <div class="container">
+            <div class="header">
+                <h1>Employee Attendance Portal</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <div class="input-container">
+                <div class="input-group">
+                    <input type="text" id="employeeId" placeholder="Employee ID" required oninput="filterInput(event)" maxlength="7">
+                </div>
+            </div>
+            <div class="btn-container">
+                <button class="btn-in" onclick="punchIn()">Punch In</button>
+                <button class="btn-out" onclick="punchOut()">Punch Out</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Your Recent Records</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Employee ID</th>
+                            <th>Date</th>
+                            <th>In</th>
+                            <th>Out</th>
+                            <th>Hours</th>
+                            <th>Status</th>
+                            <th>Attendance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordsTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Popup -->
+    <div id="successPopup" class="popup">
+        <span class="success-icon">✓</span>
+        <span id="popupMessage"></span>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+
+        function showPopup(message) {
+            const popup = document.getElementById('successPopup');
+            const popupMessage = document.getElementById('popupMessage');
+            popupMessage.textContent = message;
+            popup.style.display = 'block';
+            
+            // Hide the popup after 3 seconds
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 3000);
+        }
+
+        async function punchIn() {
+            const employeeId = document.getElementById('employeeId').value;
+
+            if (!employeeId) {
+                alert('Please enter Employee ID');
+                return;
+            }
+
+            const employeeIdPattern = /^ATS0(?!000)\d{3}$/;
+            if (!employeeIdPattern.test(employeeId)) {
+                alert('Invalid Employee ID format. It must start with ATS uppercase letters, followed by 0, and end with 3 digits.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/punch-in`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ employeeId })
+                });
+                const data = await response.json();
+
+                if (!response.ok) {
+                    alert(data.error);
+                    return;
+                }
+
+                updateTable(employeeId);
+                document.getElementById('employeeId').value = '';
+                showPopup(data.message);
+            } catch (error) {
+                console.error('Punch-in error:', error);
+                alert('Failed to punch in. Please try again.');
+            }
+        }
+
+        async function punchOut() {
+            const employeeId = document.getElementById('employeeId').value;
+
+            if (!employeeId) {
+                alert('Please enter Employee ID');
+                return;
+            }
+
+            const employeeIdPattern = /^ATS0(?!000)\d{3}$/;
+            if (!employeeIdPattern.test(employeeId)) {
+                alert('Invalid Employee ID format. It must start with ATS uppercase letters, followed by 0, and end with 3 digits.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/punch-out`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ employeeId })
+                });
+                const data = await response.json();
+
+                if (!response.ok) {
+                    alert(data.error);
+                    return;
+                }
+
+                updateTable(employeeId);
+                document.getElementById('employeeId').value = '';
+                showPopup(data.message);
+            } catch (error) {
+                console.error('Punch-out error:', error);
+                alert('Failed to punch out. Please try again.');
+            }
+        }
+
+        async function updateTable(employeeId) {
+            const tbody = document.getElementById('recordsTable');
+            tbody.innerHTML = '';
+
+            try {
+                const response = await fetch(`${API_URL}/records/${employeeId}`);
+                const employeeRecords = await response.json();
+
+                if (employeeRecords.length === 0) {
+                    const row = tbody.insertRow();
+                    const cell = row.insertCell(0);
+                    cell.colSpan = 7;
+                    cell.textContent = "No records found";
+                    cell.style.textAlign = "center";
+                    cell.style.padding = "20px";
+                    return;
+                }
+
+                employeeRecords.forEach((record, index) => {
+                    const row = tbody.insertRow();
+                    row.style.animationDelay = `${index * 0.1}s`;
+                    
+                    let attendanceStatusClass = '';
+                    if (record.attendance_status === 'Absent') {
+                        attendanceStatusClass = 'status-absent';
+                    } else if (record.attendance_status === 'Half Day') {
+                        attendanceStatusClass = 'status-halfday';
+                    } else if (record.attendance_status === 'Present') {
+                        attendanceStatusClass = 'status-present';
+                    }
+                    
+                    row.innerHTML = ` 
+                        <td>${record.employee_id}</td>
+                        <td>${new Date(record.date).toLocaleDateString()}</td>
+                        <td>${record.punch_in}</td>
+                        <td>${record.punch_out || '-'}</td>
+                        <td>${record.total_hours || '-'}</td>
+                        <td class="${record.punch_out ? 'status-out' : 'status-in'}">
+                            ${record.punch_out ? 'Out' : 'In'}
+                        </td>
+                        <td class="${attendanceStatusClass}">
+                            ${record.attendance_status || '-'}
+                        </td>
+                    `;
+                });
+            } catch (error) {
+                console.error('Fetch records error:', error);
+                alert('Failed to load records. Please try again.');
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('employeeId').value = '';
+        }
+
+        function filterInput(event) {
+            let inputValue = event.target.value;
+            inputValue = inputValue.replace(/[^a-zA-Z0-9]/g, '');
+            event.target.value = inputValue;
+        }
+
+        window.onload = function() {
+            const storedId = localStorage.getItem('lastEmployeeId');
+            if (storedId) {
+                document.getElementById('employeeId').value = storedId;
+                updateTable(storedId);
+            }
+        };
+
+        document.getElementById('employeeId').addEventListener('change', function() {
+            const employeeId = this.value;
+            if (employeeId && /^ATS0(?!000)\d{3}$/.test(employeeId)) {
+                localStorage.setItem('lastEmployeeId', employeeId);
+                updateTable(employeeId);
+            }
+        });
+    </script>
+</body>
+</html>
