@@ -1,0 +1,60 @@
+version: "3.9"
+
+services:
+  # --------------------- PostgreSQL --------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: attendance_postgres
+    ports:
+      - "5437:5432"                 # host:container
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: attendance_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  
+    networks: [attendance_net]
+
+  # --------------------- Node.js backend ---------------------------------
+  backend:
+    build: ./Backend                # uses Backend/Dockerfile
+    container_name: attendance_backend
+    ports:
+      - "3007:3007"
+    depends_on:
+      - postgres
+    environment:
+      PGUSER: postgres
+      PGPASSWORD: admin123
+      PGHOST: postgres
+      PGDATABASE: attendance_db
+      PGPORT: 5432
+    networks: [attendance_net]
+
+  # --------------------- Employee portal ---------------------------------
+  employee-attendance:
+    build: ./Employee-attendance    # uses Employee-attendance/Dockerfile
+    container_name: employee_attendance_ui
+    ports:
+      - "8109:80"                   # host 8109 → nginx 80
+    depends_on:
+      - backend
+    networks: [attendance_net]
+
+  # --------------------- HR portal ---------------------------------------
+  hr-attendance:
+    build: ./HR-attendance          # uses HR-attendance/Dockerfile
+    container_name: hr_attendance_ui
+    ports:
+      - "8110:80"                   # host 8110 → nginx 80
+    depends_on:
+      - backend
+    networks: [attendance_net]
+
+volumes:
+  pgdata:
+
+networks:
+  attendance_net:
+
