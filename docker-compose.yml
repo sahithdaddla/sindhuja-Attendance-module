@@ -6,7 +6,7 @@ services:
     image: postgres:16-alpine
     container_name: attendance_postgres
     ports:
-      - "5437:5432"                 # host:container
+      - "5208:5432"                 # host:container
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin123
@@ -21,7 +21,7 @@ services:
     build: ./Backend                # uses Backend/Dockerfile
     container_name: attendance_backend
     ports:
-      - "3007:3007"
+      - "3208:3208"
     depends_on:
       - postgres
     environment:
@@ -37,7 +37,7 @@ services:
     build: ./Employee-attendance    # uses Employee-attendance/Dockerfile
     container_name: employee_attendance_ui
     ports:
-      - "8109:80"                   # host 8109 → nginx 80
+      - "8015:80"                   # host 8109 → nginx 80
     depends_on:
       - backend
     networks: [attendance_net]
@@ -47,7 +47,7 @@ services:
     build: ./HR-attendance          # uses HR-attendance/Dockerfile
     container_name: hr_attendance_ui
     ports:
-      - "8110:80"                   # host 8110 → nginx 80
+      - "8016:80"                   # host 8110 → nginx 80
     depends_on:
       - backend
     networks: [attendance_net]
