@@ -9,6 +9,6 @@ RUN npm ci --omit=dev
 # Copy source files
 COPY . .
 
-EXPOSE 3007
+EXPOSE 3208
 CMD ["node", "server.js"]
 
