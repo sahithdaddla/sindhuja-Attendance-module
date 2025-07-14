@@ -4,7 +4,7 @@ services:
   # --------------------- PostgreSQL --------------------------------------
   postgres:
     image: postgres:16-alpine
-    container_name: attendance_postgres
+    container_name: attendance1_postgres
     ports:
       - "5208:5432"                 # host:container
     environment:
@@ -19,7 +19,7 @@ services:
   # --------------------- Node.js backend ---------------------------------
   backend:
     build: ./Backend                # uses Backend/Dockerfile
-    container_name: attendance_backend
+    container_name: attendance1_backend
     ports:
       - "3208:3208"
     depends_on:
@@ -35,7 +35,7 @@ services:
   # --------------------- Employee portal ---------------------------------
   employee-attendance:
     build: ./Employee-attendance    # uses Employee-attendance/Dockerfile
-    container_name: employee_attendance_ui
+    container_name: employee1_attendance_ui
     ports:
       - "8015:80"                   # host 8109 → nginx 80
     depends_on:
@@ -45,7 +45,7 @@ services:
   # --------------------- HR portal ---------------------------------------
   hr-attendance:
     build: ./HR-attendance          # uses HR-attendance/Dockerfile
-    container_name: hr_attendance_ui
+    container_name: hr_attendance1_ui
     ports:
       - "8016:80"                   # host 8110 → nginx 80
     depends_on:
